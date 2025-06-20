@@ -52,21 +52,21 @@ jobs:
       run: |
         gcloud builds submit --config cloudbuild-opportunity.yaml
         gcloud run deploy anip-opportunity-identifier \
-          --image us-central1-docker.pkg.dev/$PROJECT_ID/anipe-repo/anip-opportunity-identifier:v1.0 \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-opportunity-identifier:v1.0 \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
-          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION
+          --set-env-vars GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCS_BUCKET_NAME=${{ env.GCS_BUCKET_NAME }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
     - name: Deploy Product Generator Service
       run: |
         gcloud builds submit --config cloudbuild-product.yaml
         gcloud run deploy anip-product-generator \
-          --image us-central1-docker.pkg.dev/$PROJECT_ID/anipe-repo/anip-product-generator:v1.0 \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-product-generator:v1.0 \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
-          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION
+          --set-env-vars GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCS_BUCKET_NAME=${{ env.GCS_BUCKET_NAME }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
     - name: Deploy Workflow
       run: |

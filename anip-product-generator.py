@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 from google.cloud import storage
+import google.generativeai as genai
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -10,22 +11,65 @@ app = Flask(__name__)
 # Initialize GCP clients
 try:
     storage_client = storage.Client()
+    # Configure Gemini API (using API key approach for simplicity)
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        print("Warning: GEMINI_API_KEY not found, using simulated responses")
 except Exception as e:
     print(f"Error initializing GCP clients: {e}")
 
 # Get environment variables
 GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "windsurf-anipe-data")
 
-# --- Helper Function: Generate Product Content with Simulated AI Response ---
+# --- Helper Function: Generate Product Content with AI ---
 def generate_product_content(opportunity: dict) -> str:
     """
-    Simulates an AI response for generating the content for the digital product based on the identified opportunity.
+    Uses Gemini AI to generate content for the digital product based on the identified opportunity.
+    Falls back to simulated responses if AI is unavailable.
     """
     niche_topic = opportunity.get("niche_topic", "an unspecified niche")
     product_idea = opportunity.get("product_idea", "a detailed report")
-    problem_statement = opportunity.get("problem_statement", "a common problem")
+    problem_statement = opportunity.get("problem_statement", "a general problem")
     target_audience = opportunity.get("target_audience", "general audience")
     
+    prompt = f"""
+    Generate a comprehensive, high-quality digital product for the following opportunity:
+    
+    Product Idea: {product_idea}
+    Niche Topic: {niche_topic}
+    Problem Addressed: {problem_statement}
+    Target Audience: {target_audience}
+    
+    Create a professional report or guide with the following structure:
+    1. Executive Summary (2-3 paragraphs)
+    2. Introduction to the Problem (detailed explanation)
+    3. Market Analysis (current trends, opportunities)
+    4. Detailed Solution/Strategy (at least 3 main sections with actionable insights)
+    5. Implementation Guidelines (step-by-step recommendations)
+    6. Tools and Resources (specific recommendations)
+    7. Future Outlook and Trends
+    8. Conclusion with Key Takeaways
+    
+    Make it authoritative, valuable, and actionable for the target audience.
+    The content should be comprehensive (aim for 2000+ words) and provide genuine value.
+    Use professional formatting with clear headings and bullet points where appropriate.
+    """
+    
+    # Try to use Gemini AI
+    try:
+        if os.environ.get("GEMINI_API_KEY"):
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content(prompt)
+            return f"# AI-Generated Product Report\n\n{response.text}\n\n---\n*Generated using Gemini AI*"
+        else:
+            raise Exception("No API key available")
+            
+    except Exception as e:
+        print(f"AI generation failed ({e}), using simulated response")
+        
+    # Fallback to simulated response
     simulated_response = f"""
     # Executive Summary
 
@@ -46,6 +90,9 @@ def generate_product_content(opportunity: dict) -> str:
     # Conclusion
 
     This is a simulated conclusion for the product idea.
+
+    ---
+    *Generated using simulated AI response*
     """
     
     return simulated_response
@@ -80,7 +127,7 @@ def generate_product():
         
         print(f"Generating product for niche: {opportunity.get('niche_topic', 'N/A')}")
         
-        # Generate product content using simulated AI response
+        # Generate product content using AI
         product_content = generate_product_content(opportunity)
         
         # Save the generated product content to GCS

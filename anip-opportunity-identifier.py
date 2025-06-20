@@ -4,6 +4,7 @@ import random
 from datetime import datetime
 from flask import Flask, request, jsonify
 from google.cloud import storage
+import google.generativeai as genai
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -11,6 +12,12 @@ app = Flask(__name__)
 # Initialize GCP clients
 try:
     storage_client = storage.Client()
+    # Configure Gemini API (using API key approach for simplicity)
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key:
+        genai.configure(api_key=api_key)
+    else:
+        print("Warning: GEMINI_API_KEY not found, using simulated responses")
 except Exception as e:
     print(f"Error initializing GCP clients: {e}")
 
@@ -59,22 +66,63 @@ def perform_web_search(query: str, num_results: int = 5) -> list:
     print(f"Selected broad topic: {broad_topic}")
     return simulated_results.get(broad_topic, [])
 
-# --- Helper Function: Use Simulated AI Responses ---
+# --- Helper Function: Use AI for Niche Identification ---
 def identify_niche_opportunity(search_results: list) -> dict:
     """
-    Simulates an LLM to analyze search results and identify a specific, actionable niche opportunity.
+    Uses Gemini AI to analyze search results and identify a specific, actionable niche opportunity.
+    Falls back to simulated responses if AI is unavailable.
     """
     if not search_results:
         return {"status": "no_opportunity", "message": "No relevant search results found."}
 
-    # Simulated AI response
+    prompt = f"""
+    Analyze the following web search results and identify a highly specific, commercially viable micro-niche opportunity.
+    Focus on a problem or question that AI could help solve or provide unique insights for.
+    
+    Search Results:
+    {json.dumps(search_results, indent=2)}
+    
+    Provide your analysis in JSON format with the following keys:
+    - "niche_topic": A very specific, actionable topic (e.g., "AI-powered personalized nutrition plans for diabetics").
+    - "problem_statement": The core problem this niche addresses.
+    - "target_audience": Who would pay for a solution/product in this niche.
+    - "product_idea": A concrete digital product idea (e.g., "A weekly AI-generated report on emerging sustainable energy patents").
+    - "keywords": 3-5 relevant keywords for this niche.
+    - "confidence_score": A score from 0.0 to 1.0 indicating confidence in this opportunity.
+    """
+    
+    # Try to use Gemini AI
+    try:
+        if os.environ.get("GEMINI_API_KEY"):
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content(prompt)
+            response_text = response.text.strip()
+            
+            # Extract JSON from response text
+            if response_text.startswith("```json"):
+                response_text = response_text[7:]
+                if response_text.endswith("```"):
+                    response_text = response_text[:-3]
+            
+            opportunity = json.loads(response_text)
+            opportunity["status"] = "success"
+            opportunity["ai_powered"] = True
+            return opportunity
+        else:
+            raise Exception("No API key available")
+            
+    except Exception as e:
+        print(f"AI generation failed ({e}), using simulated response")
+        
+    # Fallback to simulated response
     opportunity = {
         "niche_topic": "AI-powered personalized nutrition plans for diabetics",
         "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
         "target_audience": "Healthcare professionals and diabetic patients",
         "product_idea": "A weekly AI-generated report on emerging sustainable energy patents",
         "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
-        "confidence_score": 0.8
+        "confidence_score": 0.8,
+        "ai_powered": False
     }
     opportunity["status"] = "success"
     return opportunity
