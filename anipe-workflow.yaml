@@ -30,7 +30,8 @@ main:
         switch:
           - condition: ${opportunityResult.body.status == "success"}
             next: generateProduct
-        next: handleError
+          - condition: true  # default case
+            next: handleError
             
     # Step 3: Call the Product Generator service with the identified opportunity
     - generateProduct:
