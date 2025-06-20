@@ -94,7 +94,7 @@ def identify_niche_opportunity(search_results: list) -> dict:
     # Try to use Gemini AI
     try:
         if os.environ.get("GEMINI_API_KEY"):
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             response_text = response.text.strip()
             

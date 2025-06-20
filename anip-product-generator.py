@@ -60,7 +60,7 @@ def generate_product_content(opportunity: dict) -> str:
     # Try to use Gemini AI
     try:
         if os.environ.get("GEMINI_API_KEY"):
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-1.5-flash')
             response = model.generate_content(prompt)
             print(f"AI product generation successful for: {niche_topic}")
             return f"# AI-Generated Product Report\n\n{response.text}\n\n---\n*Generated using Gemini AI*"
