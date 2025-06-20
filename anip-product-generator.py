@@ -3,8 +3,6 @@ import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 from google.cloud import storage
-import vertexai
-from vertexai.generative_models import GenerativeModel
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -12,50 +10,45 @@ app = Flask(__name__)
 # Initialize GCP clients
 try:
     storage_client = storage.Client()
-    vertexai.init(project=os.environ.get("GCP_PROJECT_ID", "windsurf-ai-project"), 
-                  location=os.environ.get("GCP_REGION", "us-central1"))
 except Exception as e:
     print(f"Error initializing GCP clients: {e}")
 
 # Get environment variables
 GCS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "windsurf-anipe-data")
 
-# --- Helper Function: Generate Product Content with LLM ---
+# --- Helper Function: Generate Product Content with Simulated AI Response ---
 def generate_product_content(opportunity: dict) -> str:
     """
-    Uses an LLM to generate the content for the digital product based on the identified opportunity.
+    Simulates an AI response for generating the content for the digital product based on the identified opportunity.
     """
     niche_topic = opportunity.get("niche_topic", "an unspecified niche")
     product_idea = opportunity.get("product_idea", "a detailed report")
     problem_statement = opportunity.get("problem_statement", "a common problem")
     target_audience = opportunity.get("target_audience", "general audience")
     
-    prompt = f"""
-    Generate a comprehensive, high-quality digital product.
-    
-    Product Idea: {product_idea}
-    Niche Topic: {niche_topic}
-    Problem Addressed: {problem_statement}
-    Target Audience: {target_audience}
-    
-    Structure the content as a professional report or guide, including:
-    1. An executive summary.
-    2. Introduction to the problem.
-    3. Detailed analysis/solution (at least 3 main sections).
-    4. Actionable recommendations or next steps.
-    5. Conclusion.
-    
-    Ensure the tone is authoritative and provides genuine value to the target audience.
-    The report should be at least 1500 words.
+    simulated_response = f"""
+    # Executive Summary
+
+    This is a simulated executive summary for the product idea: {product_idea}.
+
+    # Introduction to the Problem
+
+    The problem statement is: {problem_statement}.
+
+    # Detailed Analysis/Solution
+
+    This is a simulated detailed analysis/solution for the problem statement.
+
+    # Actionable Recommendations or Next Steps
+
+    These are simulated actionable recommendations or next steps for the target audience: {target_audience}.
+
+    # Conclusion
+
+    This is a simulated conclusion for the product idea.
     """
     
-    try:
-        model = GenerativeModel(model_id="gemini-pro")
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        print(f"Error generating product content with LLM: {e}")
-        return f"Error: Could not generate product content. {e}"
+    return simulated_response
 
 # --- API Endpoint ---
 @app.route('/generate', methods=['POST'])
@@ -87,7 +80,7 @@ def generate_product():
         
         print(f"Generating product for niche: {opportunity.get('niche_topic', 'N/A')}")
         
-        # Generate product content using LLM
+        # Generate product content using simulated AI response
         product_content = generate_product_content(opportunity)
         
         # Save the generated product content to GCS
