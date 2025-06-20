@@ -4,7 +4,8 @@ import random
 from datetime import datetime
 from flask import Flask, request, jsonify
 from google.cloud import storage
-from google.cloud import aiplatform
+import vertexai
+from vertexai.generative_models import GenerativeModel
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -12,8 +13,8 @@ app = Flask(__name__)
 # Initialize GCP clients
 try:
     storage_client = storage.Client()
-    aiplatform.init(project=os.environ.get("GCP_PROJECT_ID", "windsurf-ai-project"), 
-                    location=os.environ.get("GCP_REGION", "us-central1"))
+    vertexai.init(project=os.environ.get("GCP_PROJECT_ID", "windsurf-ai-project"), 
+                  location=os.environ.get("GCP_REGION", "us-central1"))
 except Exception as e:
     print(f"Error initializing GCP clients: {e}")
 
@@ -88,7 +89,7 @@ def identify_niche_opportunity(search_results: list) -> dict:
     
     try:
         # Use Vertex AI's Gemini model
-        model = aiplatform.GenerativeModel(model_id="gemini-pro")
+        model = GenerativeModel(model_id="gemini-pro")
         response = model.generate_content(prompt)
         
         # Extract JSON from response text
