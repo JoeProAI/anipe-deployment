@@ -33,7 +33,7 @@ jobs:
     - name: Activate Service Account
       run: |
         gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-        gcloud config set project ${{ env.GCP_PROJECT_ID }}
+        gcloud config set project $PROJECT_ID
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
@@ -64,7 +64,7 @@ jobs:
     - name: Deploy Opportunity Identifier Service
       run: |
         gcloud run deploy anip-opportunity-identifier \
-          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-opportunity-identifier:latest \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-opportunity-identifier:latest \
           --platform managed \
           --region us-central1 \
           --allow-unauthenticated \
@@ -73,7 +73,7 @@ jobs:
     - name: Deploy Product Generator Service
       run: |
         gcloud run deploy anip-product-generator \
-          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-product-generator:latest \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-product-generator:latest \
           --platform managed \
           --region us-central1 \
           --allow-unauthenticated \
@@ -82,7 +82,7 @@ jobs:
     - name: Deploy Sales Page Generator Service
       run: |
         gcloud run deploy anip-sales-page-generator \
-          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-sales-page-generator:latest \
+          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-sales-page-generator:latest \
           --platform managed \
           --region us-central1 \
           --allow-unauthenticated \
