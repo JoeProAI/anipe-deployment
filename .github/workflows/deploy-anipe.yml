@@ -30,12 +30,16 @@ jobs:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+    - name: Activate Service Account
+      run: |
+        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+        gcloud config set project ${{ env.GCP_PROJECT_ID }}
+
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v2
 
     - name: Configure gcloud
       run: |
-        gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
         gcloud config set run/region $GCP_REGION
 
     - name: Enable APIs
