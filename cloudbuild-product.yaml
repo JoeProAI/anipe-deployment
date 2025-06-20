@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}', '-f', 'Dockerfile-product.txt', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}', '-f', 'Dockerfile-product.txt', '.']
 
-  # Push the container image to Container Registry
+  # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}']
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}']
   
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -14,16 +14,16 @@ steps:
     - 'run'
     - 'deploy'
     - 'anip-product-generator'
-    - '--image=gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}'
+    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}'
     - '--platform=managed'
     - '--region=${_REGION}'
     - '--allow-unauthenticated'
     - '--memory=1Gi'
     - '--set-env-vars=GCS_BUCKET_NAME=${_GCS_BUCKET_NAME},GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${_REGION}'
 
-# Store images in Google Container Registry
+# Store images in Artifact Registry
 images:
-  - 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}'
 
 substitutions:
   _VERSION: v1.0
