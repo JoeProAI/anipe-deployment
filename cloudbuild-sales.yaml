@@ -1,0 +1,19 @@
+steps:
+  # Build the sales page generator container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-sales-page-generator:latest'
+      - '-f'
+      - 'Dockerfile.sales'
+      - '.'
+
+  # Push the image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-sales-page-generator:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

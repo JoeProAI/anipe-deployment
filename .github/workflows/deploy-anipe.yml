@@ -48,35 +48,58 @@ jobs:
         gcloud services enable aiplatform.googleapis.com
         gcloud services enable storage.googleapis.com
 
+    - name: Build Opportunity Identifier Service
+      run: gcloud builds submit --config cloudbuild-opportunity.yaml .
+
+    - name: Build Product Generator Service
+      run: gcloud builds submit --config cloudbuild-product.yaml .
+
+    - name: Build Sales Page Generator Service
+      run: gcloud builds submit --config cloudbuild-sales.yaml .
+
     - name: Deploy Opportunity Identifier Service
       run: |
-        gcloud builds submit --config cloudbuild-opportunity.yaml
         gcloud run deploy anip-opportunity-identifier \
-          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-opportunity-identifier:v1.0 \
-          --region $GCP_REGION \
+          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-opportunity-identifier:latest \
           --platform managed \
+          --region us-central1 \
           --allow-unauthenticated \
-          --set-env-vars GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCS_BUCKET_NAME=${{ env.GCS_BUCKET_NAME }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}"
 
     - name: Deploy Product Generator Service
       run: |
-        gcloud builds submit --config cloudbuild-product.yaml
         gcloud run deploy anip-product-generator \
-          --image us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/anipe-repo/anip-product-generator:v1.0 \
-          --region $GCP_REGION \
+          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-product-generator:latest \
           --platform managed \
+          --region us-central1 \
           --allow-unauthenticated \
-          --set-env-vars GCP_PROJECT_ID=${{ env.PROJECT_ID }},GCS_BUCKET_NAME=${{ env.GCS_BUCKET_NAME }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}"
+
+    - name: Deploy Sales Page Generator Service
+      run: |
+        gcloud run deploy anip-sales-page-generator \
+          --image us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/anipe-repo/anip-sales-page-generator:latest \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},GCS_BUCKET_NAME=${{ env.GCS_BUCKET_NAME }}"
+
+    - name: Create Sales Pages Bucket
+      run: |
+        gsutil mb gs://windsurf-anipe-sales-pages || echo "Bucket may already exist"
+        gsutil iam ch allUsers:objectViewer gs://windsurf-anipe-sales-pages
 
     - name: Deploy Workflow
       run: |
         # Get the deployed service URLs
         OPPORTUNITY_URL=$(gcloud run services describe anip-opportunity-identifier --region=$GCP_REGION --format='value(status.url)')
         PRODUCT_URL=$(gcloud run services describe anip-product-generator --region=$GCP_REGION --format='value(status.url)')
+        SALES_PAGE_URL=$(gcloud run services describe anip-sales-page-generator --region=$GCP_REGION --format='value(status.url)')
         
         # Update workflow YAML with actual URLs
         sed -i "s|OPPORTUNITY_IDENTIFIER_URL|$OPPORTUNITY_URL|g" anipe-workflow.yaml
         sed -i "s|PRODUCT_GENERATOR_URL|$PRODUCT_URL|g" anipe-workflow.yaml
+        sed -i "s|SALES_PAGE_GENERATOR_URL|$SALES_PAGE_URL|g" anipe-workflow.yaml
         
         # Deploy the workflow
         gcloud workflows deploy anipe-workflow \

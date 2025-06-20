@@ -38,25 +38,51 @@ main:
         call: http.post
         args:
           url: PRODUCT_GENERATOR_URL/generate
-          auth:
-            type: OIDC
+          body:
+            niche_topic: ${opportunityResult.body.opportunity.niche_topic}
+            problem_statement: ${opportunityResult.body.opportunity.problem_statement}
+            target_audience: ${opportunityResult.body.opportunity.target_audience}
+            product_idea: ${opportunityResult.body.opportunity.product_idea}
+          timeout: 300
+        result: productResult
+
+    # Step 4: Call the Sales Page Generator service with the generated product
+    - generateSalesPage:
+        call: http.post
+        args:
+          url: SALES_PAGE_GENERATOR_URL/generate
           body:
             opportunity: ${opportunityResult.body.opportunity}
-            gcs_path: ${opportunityResult.body.gcs_path}
-        result: productResult
-        
-    # Log the generated product
-    - logProduct:
-        call: sys.log
+            product_content: ${productResult.body.content}
+          timeout: 300
+        result: salesPageResult
+
+    # Step 5: Store the results
+    - storeResults:
+        call: http.post
         args:
-          text: '${"Generated product at: " + string(productResult.body.product_gcs_path)}'
-          severity: INFO
-          
+          url: https://storage.googleapis.com/upload/storage/v1/b/windsurf-anipe-data/o
+          query:
+            uploadType: media
+            name: ${"results/anipe_complete_" + string(sys.now()) + ".json"}
+          headers:
+            Authorization: ${"Bearer " + sys.get_env("GOOGLE_CLOUD_TOKEN")}
+            Content-Type: application/json
+          body:
+            timestamp: ${string(sys.now())}
+            opportunity: ${opportunityResult.body.opportunity}
+            product_path: ${productResult.body.gcs_path}
+            sales_page_url: ${salesPageResult.body.gcs_url}
+            status: "success"
+          timeout: 60
+        result: storeResult
+
     # Return the final result
     - returnResult:
         return:
           opportunity: ${opportunityResult.body.opportunity}
-          product_path: ${productResult.body.product_gcs_path}
+          product_path: ${productResult.body.gcs_path}
+          sales_page_url: ${salesPageResult.body.gcs_url}
           status: "success"
           message: "ANIPE workflow completed successfully"
           
