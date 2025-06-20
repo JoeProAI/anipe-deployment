@@ -1,0 +1,34 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}', '-f', 'Dockerfile-product.txt', '.']
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+    - 'run'
+    - 'deploy'
+    - 'anip-product-generator'
+    - '--image=gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}'
+    - '--platform=managed'
+    - '--region=${_REGION}'
+    - '--allow-unauthenticated'
+    - '--memory=1Gi'
+    - '--set-env-vars=GCS_BUCKET_NAME=${_GCS_BUCKET_NAME},GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${_REGION}'
+
+# Store images in Google Container Registry
+images:
+  - 'gcr.io/${PROJECT_ID}/anip-product-generator:${_VERSION}'
+
+substitutions:
+  _VERSION: v1.0
+  _REGION: us-central1
+  _GCS_BUCKET_NAME: windsurf-anipe-data  # Replace with your actual bucket name
+
+options:
+  logging: CLOUD_LOGGING_ONLY

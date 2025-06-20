@@ -1,0 +1,88 @@
+name: Deploy ANIPE to Google Cloud Run
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: us-central1
+  GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Enable APIs
+      run: |
+        gcloud services enable run.googleapis.com
+        gcloud services enable cloudbuild.googleapis.com
+        gcloud services enable artifactregistry.googleapis.com
+        gcloud services enable cloudscheduler.googleapis.com
+        gcloud services enable workflows.googleapis.com
+        gcloud services enable aiplatform.googleapis.com
+        gcloud services enable storage.googleapis.com
+
+    - name: Deploy Opportunity Identifier Service
+      run: |
+        gcloud run deploy anip-opportunity-identifier \
+          --source . \
+          --region $GCP_REGION \
+          --platform managed \
+          --allow-unauthenticated \
+          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION \
+          --dockerfile Dockerfile.opportunity
+
+    - name: Deploy Product Generator Service
+      run: |
+        gcloud run deploy anip-product-generator \
+          --source . \
+          --region $GCP_REGION \
+          --platform managed \
+          --allow-unauthenticated \
+          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION \
+          --dockerfile Dockerfile.product
+
+    - name: Deploy Workflow
+      run: |
+        # Get the deployed service URLs
+        OPPORTUNITY_URL=$(gcloud run services describe anip-opportunity-identifier --region=$GCP_REGION --format='value(status.url)')
+        PRODUCT_URL=$(gcloud run services describe anip-product-generator --region=$GCP_REGION --format='value(status.url)')
+        
+        # Update workflow YAML with actual URLs
+        sed -i "s|OPPORTUNITY_IDENTIFIER_URL|$OPPORTUNITY_URL|g" anipe-workflow.yaml
+        sed -i "s|PRODUCT_GENERATOR_URL|$PRODUCT_URL|g" anipe-workflow.yaml
+        
+        # Deploy the workflow
+        gcloud workflows deploy anipe-workflow \
+          --source=anipe-workflow.yaml \
+          --location=$GCP_REGION
+
+    - name: Create Scheduler Job
+      run: |
+        # Create scheduler job (will not fail if already exists)
+        gcloud scheduler jobs create http anipe-daily-job \
+          --schedule="0 2 * * *" \
+          --http-method=POST \
+          --uri="https://workflowexecutions-$GCP_REGION.googleapis.com/v1/projects/$PROJECT_ID/locations/$GCP_REGION/workflows/anipe-workflow/executions" \
+          --headers="Authorization=Bearer $(gcloud auth print-access-token)" \
+          --time-zone="America/New_York" \
+          --location=$GCP_REGION || echo "Scheduler job already exists"

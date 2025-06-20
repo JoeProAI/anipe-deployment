@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Google Cloud
+*.json
+!cloudbuild*.yaml
+windsurf-ai-project-*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# Node modules (if any)
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Local environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# Coverage reports
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Documentation builds
+docs/_build/
