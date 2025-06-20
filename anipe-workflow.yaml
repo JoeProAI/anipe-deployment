@@ -22,7 +22,7 @@ main:
     - logOpportunity:
         call: sys.log
         args:
-          text: ${text.format("Identified opportunity: %s", opportunityResult.body.opportunity.niche_topic)}
+          text: '${"Identified opportunity: " + string(opportunityResult.body.opportunity.niche_topic)}'
           severity: INFO
           
     # Step 2: Check if opportunity was successfully identified
@@ -48,7 +48,7 @@ main:
     - logProduct:
         call: sys.log
         args:
-          text: ${text.format("Generated product at: %s", productResult.body.product_gcs_path)}
+          text: '${"Generated product at: " + string(productResult.body.product_gcs_path)}'
           severity: INFO
           
     # Return the final result
