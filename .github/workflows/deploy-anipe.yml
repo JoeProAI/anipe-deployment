@@ -50,23 +50,23 @@ jobs:
 
     - name: Deploy Opportunity Identifier Service
       run: |
+        gcloud builds submit --config cloudbuild-opportunity.yaml --substitutions=_SERVICE_NAME=anip-opportunity-identifier
         gcloud run deploy anip-opportunity-identifier \
-          --source . \
+          --image gcr.io/$PROJECT_ID/anip-opportunity-identifier:latest \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
-          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION \
-          --dockerfile Dockerfile.opportunity
+          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION
 
     - name: Deploy Product Generator Service
       run: |
+        gcloud builds submit --config cloudbuild-product.yaml --substitutions=_SERVICE_NAME=anip-product-generator
         gcloud run deploy anip-product-generator \
-          --source . \
+          --image gcr.io/$PROJECT_ID/anip-product-generator:latest \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
-          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION \
-          --dockerfile Dockerfile.product
+          --set-env-vars GCS_BUCKET_NAME=$GCS_BUCKET_NAME,GCP_PROJECT_ID=$PROJECT_ID,GCP_REGION=$GCP_REGION
 
     - name: Deploy Workflow
       run: |
