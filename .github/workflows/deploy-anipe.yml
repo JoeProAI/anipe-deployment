@@ -52,7 +52,7 @@ jobs:
       run: |
         gcloud builds submit --config cloudbuild-opportunity.yaml
         gcloud run deploy anip-opportunity-identifier \
-          --image gcr.io/$PROJECT_ID/anip-opportunity-identifier:latest \
+          --image us-central1-docker.pkg.dev/$PROJECT_ID/anipe-repo/anip-opportunity-identifier:v1.0 \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
@@ -62,7 +62,7 @@ jobs:
       run: |
         gcloud builds submit --config cloudbuild-product.yaml
         gcloud run deploy anip-product-generator \
-          --image gcr.io/$PROJECT_ID/anip-product-generator:latest \
+          --image us-central1-docker.pkg.dev/$PROJECT_ID/anipe-repo/anip-product-generator:v1.0 \
           --region $GCP_REGION \
           --platform managed \
           --allow-unauthenticated \
