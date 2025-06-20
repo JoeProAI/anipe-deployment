@@ -50,7 +50,7 @@ jobs:
 
     - name: Deploy Opportunity Identifier Service
       run: |
-        gcloud builds submit --config cloudbuild-opportunity.yaml --substitutions=_SERVICE_NAME=anip-opportunity-identifier
+        gcloud builds submit --config cloudbuild-opportunity.yaml
         gcloud run deploy anip-opportunity-identifier \
           --image gcr.io/$PROJECT_ID/anip-opportunity-identifier:latest \
           --region $GCP_REGION \
@@ -60,7 +60,7 @@ jobs:
 
     - name: Deploy Product Generator Service
       run: |
-        gcloud builds submit --config cloudbuild-product.yaml --substitutions=_SERVICE_NAME=anip-product-generator
+        gcloud builds submit --config cloudbuild-product.yaml
         gcloud run deploy anip-product-generator \
           --image gcr.io/$PROJECT_ID/anip-product-generator:latest \
           --region $GCP_REGION \
