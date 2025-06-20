@@ -11,7 +11,7 @@ main:
     - identifyOpportunity:
         call: http.post
         args:
-          url: https://anip-opportunity-identifier-URL_PLACEHOLDER.run.app/identify
+          url: OPPORTUNITY_IDENTIFIER_URL/identify
           auth:
             type: OIDC
           body:
@@ -37,7 +37,7 @@ main:
     - generateProduct:
         call: http.post
         args:
-          url: https://anip-product-generator-URL_PLACEHOLDER.run.app/generate
+          url: PRODUCT_GENERATOR_URL/generate
           auth:
             type: OIDC
           body:
