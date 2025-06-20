@@ -107,25 +107,28 @@ def identify_niche_opportunity(search_results: list) -> dict:
             opportunity = json.loads(response_text)
             opportunity["status"] = "success"
             opportunity["ai_powered"] = True
+            print(f"AI generation successful: {opportunity.get('niche_topic', 'N/A')}")
             return opportunity
         else:
             raise Exception("No API key available")
             
     except Exception as e:
-        print(f"AI generation failed ({e}), using simulated response")
+        error_msg = f"AI generation failed: {str(e)}"
+        print(error_msg)
         
-    # Fallback to simulated response
-    opportunity = {
-        "niche_topic": "AI-powered personalized nutrition plans for diabetics",
-        "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
-        "target_audience": "Healthcare professionals and diabetic patients",
-        "product_idea": "A weekly AI-generated report on emerging sustainable energy patents",
-        "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
-        "confidence_score": 0.8,
-        "ai_powered": False
-    }
-    opportunity["status"] = "success"
-    return opportunity
+        # Include error details in fallback response for debugging
+        opportunity = {
+            "niche_topic": "AI-powered personalized nutrition plans for diabetics",
+            "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
+            "target_audience": "Healthcare professionals and diabetic patients", 
+            "product_idea": "A weekly AI-generated report on emerging sustainable energy patents",
+            "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
+            "confidence_score": 0.8,
+            "ai_powered": False,
+            "debug_error": error_msg  # Add error details for debugging
+        }
+        opportunity["status"] = "success"
+        return opportunity
 
 # --- API Endpoint ---
 @app.route('/identify', methods=['POST'])

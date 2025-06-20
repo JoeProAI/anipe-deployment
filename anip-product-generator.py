@@ -62,40 +62,43 @@ def generate_product_content(opportunity: dict) -> str:
         if os.environ.get("GEMINI_API_KEY"):
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content(prompt)
+            print(f"AI product generation successful for: {niche_topic}")
             return f"# AI-Generated Product Report\n\n{response.text}\n\n---\n*Generated using Gemini AI*"
         else:
             raise Exception("No API key available")
             
     except Exception as e:
-        print(f"AI generation failed ({e}), using simulated response")
+        error_msg = f"AI product generation failed: {str(e)}"
+        print(error_msg)
         
-    # Fallback to simulated response
-    simulated_response = f"""
-    # Executive Summary
+        # Fallback to simulated response with error details
+        simulated_response = f"""
+# Executive Summary
 
-    This is a simulated executive summary for the product idea: {product_idea}.
+This is a simulated executive summary for the product idea: {product_idea}.
 
-    # Introduction to the Problem
+# Introduction to the Problem
 
-    The problem statement is: {problem_statement}.
+The problem statement is: {problem_statement}.
 
-    # Detailed Analysis/Solution
+# Detailed Analysis/Solution
 
-    This is a simulated detailed analysis/solution for the problem statement.
+This is a simulated detailed analysis/solution for the problem statement.
 
-    # Actionable Recommendations or Next Steps
+# Actionable Recommendations or Next Steps
 
-    These are simulated actionable recommendations or next steps for the target audience: {target_audience}.
+These are simulated actionable recommendations or next steps for the target audience: {target_audience}.
 
-    # Conclusion
+# Conclusion
 
-    This is a simulated conclusion for the product idea.
+This is a simulated conclusion for the product idea.
 
-    ---
-    *Generated using simulated AI response*
-    """
-    
-    return simulated_response
+---
+*Generated using simulated AI response*
+*Debug Error: {error_msg}*
+"""
+        
+        return simulated_response
 
 # --- API Endpoint ---
 @app.route('/generate', methods=['POST'])
