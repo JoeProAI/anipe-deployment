@@ -22,7 +22,7 @@ main:
     - logOpportunity:
         call: sys.log
         args:
-          text: '${"Identified opportunity: " + string(opportunityResult.body.niche_topic)}'
+          text: "Opportunity identification completed - proceeding to product generation"
           severity: INFO
           
     # Step 2: Check if opportunity was successfully identified
