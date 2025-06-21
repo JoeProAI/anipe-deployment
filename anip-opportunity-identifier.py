@@ -105,6 +105,14 @@ def identify_niche_opportunity(search_results: list) -> dict:
                     response_text = response_text[:-3]
             
             opportunity = json.loads(response_text)
+            
+            # Validate that all required keys are present
+            required_keys = ["niche_topic", "problem_statement", "target_audience", "product_idea", "keywords", "confidence_score"]
+            missing_keys = [key for key in required_keys if key not in opportunity]
+            
+            if missing_keys:
+                raise Exception(f"AI response missing required keys: {missing_keys}")
+            
             opportunity["status"] = "success"
             opportunity["ai_powered"] = True
             print(f"AI generation successful: {opportunity.get('niche_topic', 'N/A')}")
@@ -116,7 +124,7 @@ def identify_niche_opportunity(search_results: list) -> dict:
         error_msg = f"AI generation failed: {str(e)}"
         print(error_msg)
         
-        # Include error details in fallback response for debugging
+        # Return reliable fallback response with all required keys
         opportunity = {
             "niche_topic": "AI-powered personalized nutrition plans for diabetics",
             "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
@@ -125,9 +133,10 @@ def identify_niche_opportunity(search_results: list) -> dict:
             "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
             "confidence_score": 0.8,
             "ai_powered": False,
-            "debug_error": error_msg  # Add error details for debugging
+            "debug_error": error_msg,  # Add error details for debugging
+            "status": "success"
         }
-        opportunity["status"] = "success"
+        
         return opportunity
 
 # --- API Endpoint ---
