@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}', '-f', 'Dockerfile-product.txt', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:latest', '-f', 'Dockerfile-product.txt', '.']
 
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}']
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:latest']
   
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -14,7 +14,7 @@ steps:
     - 'run'
     - 'deploy'
     - 'anip-product-generator'
-    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}'
+    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:latest'
     - '--platform=managed'
     - '--region=${_REGION}'
     - '--allow-unauthenticated'
@@ -23,7 +23,7 @@ steps:
 
 # Store images in Artifact Registry
 images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:${_VERSION}'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:latest'
 
 substitutions:
   _VERSION: v1.0

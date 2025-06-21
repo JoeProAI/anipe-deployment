@@ -1,11 +1,11 @@
 steps:
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:${_VERSION}', '-f', 'Dockerfile-opportunity.txt', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest', '-f', 'Dockerfile-opportunity.txt', '.']
 
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:${_VERSION}']
+    args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest']
   
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -14,7 +14,7 @@ steps:
     - 'run'
     - 'deploy'
     - 'anip-opportunity-identifier'
-    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:${_VERSION}'
+    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest'
     - '--platform=managed'
     - '--region=${_REGION}'
     - '--allow-unauthenticated'
@@ -23,7 +23,7 @@ steps:
 
 # Store images in Artifact Registry
 images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:${_VERSION}'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest'
 
 substitutions:
   _VERSION: v1.0
