@@ -43,6 +43,14 @@ main:
           timeout: 300
         result: productResult
 
+    # Step 3.5: Check if product generation was successful
+    - checkProductResult:
+        switch:
+          - condition: ${productResult.body.status == "success"}
+            next: generateSalesPage
+          - condition: true  # default case
+            next: handleError
+
     # Step 4: Call the Sales Page Generator service with the generated product
     - generateSalesPage:
         call: http.post
