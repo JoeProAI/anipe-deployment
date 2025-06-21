@@ -28,7 +28,9 @@ def generate_ai_sales_copy(product_data, product_content):
             "Expert-level knowledge distilled into practical steps"
         ],
         "description": "This comprehensive guide provides cutting-edge insights that would cost thousands from consulting firms.",
-        "urgency": "Limited time offer - Get instant access today!"
+        "urgency": "Limited time offer - Get instant access today!",
+        "template": "modern",
+        "color_scheme": "blue"
     }
     
     try:
@@ -42,7 +44,7 @@ def generate_ai_sales_copy(product_data, product_content):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel('gemini-1.5-flash')
         
-        # Create prompt for sales copy generation
+        # Create enhanced prompt for sales copy generation
         prompt = f"""
 Generate compelling sales copy for a digital product based on this content:
 
@@ -52,7 +54,7 @@ PROBLEM STATEMENT: {product_data.get('problem_statement', 'Industry challenges')
 KEYWORDS: {', '.join(product_data.get('keywords', []))}
 
 PRODUCT CONTENT PREVIEW:
-{product_content[:1000]}...
+{product_content[:1500]}...
 
 Generate sales copy in this JSON format:
 {{
@@ -62,12 +64,23 @@ Generate sales copy in this JSON format:
         "Specific benefit 1 based on actual content",
         "Specific benefit 2 based on actual content", 
         "Specific benefit 3 based on actual content",
-        "Specific benefit 4 based on actual content"
+        "Specific benefit 4 based on actual content",
+        "Specific benefit 5 based on actual content"
     ],
     "description": "2-3 sentence description of what they'll get and why it's valuable",
-    "urgency": "Urgency statement to encourage immediate action"
+    "urgency": "Urgency statement to encourage immediate action",
+    "template": "Choose from: modern, executive, minimal, bold, elegant",
+    "color_scheme": "Choose from: blue, green, purple, orange, red, teal"
 }}
 
+Template Guidelines:
+- modern: Clean, contemporary design with gradients
+- executive: Professional, corporate style with dark colors
+- minimal: Simple, clean lines with lots of white space
+- bold: High contrast, attention-grabbing design
+- elegant: Sophisticated, refined styling
+
+Choose template and colors that match the product's target audience and topic sophistication level.
 Make it sound professional but exciting. Focus on the specific value this content provides.
 """
         
@@ -84,17 +97,205 @@ Make it sound professional but exciting. Focus on the specific value this conten
         ai_copy = json.loads(response_text)
         
         # Validate required fields exist
-        required_fields = ['headline', 'subheadline', 'benefits', 'description', 'urgency']
+        required_fields = ['headline', 'subheadline', 'benefits', 'description', 'urgency', 'template', 'color_scheme']
         for field in required_fields:
             if field not in ai_copy:
                 raise ValueError(f"Missing required field: {field}")
                 
-        print(f"AI sales copy generated successfully for: {ai_copy['headline']}")
+        print(f"AI sales copy generated successfully for: {ai_copy['headline']} (Template: {ai_copy['template']}, Colors: {ai_copy['color_scheme']})")
         return ai_copy
         
     except Exception as e:
         print(f"AI sales copy generation failed: {e}, using default copy")
         return default_copy
+
+def get_template_styles(template, color_scheme):
+    """Generate CSS styles based on template and color scheme"""
+    
+    # Color palettes
+    colors = {
+        "blue": {
+            "primary": "#3498db",
+            "secondary": "#2980b9", 
+            "accent": "#e74c3c",
+            "gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "text": "#2c3e50"
+        },
+        "green": {
+            "primary": "#27ae60",
+            "secondary": "#16a085",
+            "accent": "#f39c12",
+            "gradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+            "text": "#2c3e50"
+        },
+        "purple": {
+            "primary": "#9b59b6",
+            "secondary": "#8e44ad",
+            "accent": "#e67e22",
+            "gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "text": "#2c3e50"
+        },
+        "orange": {
+            "primary": "#f39c12",
+            "secondary": "#e67e22",
+            "accent": "#e74c3c",
+            "gradient": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+            "text": "#2c3e50"
+        },
+        "red": {
+            "primary": "#e74c3c",
+            "secondary": "#c0392b",
+            "accent": "#f39c12",
+            "gradient": "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+            "text": "#2c3e50"
+        },
+        "teal": {
+            "primary": "#1abc9c",
+            "secondary": "#16a085",
+            "accent": "#e67e22",
+            "gradient": "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+            "text": "#2c3e50"
+        }
+    }
+    
+    palette = colors.get(color_scheme, colors["blue"])
+    
+    # Template-specific styles
+    if template == "executive":
+        return f"""
+        body {{
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+        }}
+        .container {{
+            background: #34495e;
+            border: 1px solid #4a5f7a;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }}
+        .header h1 {{
+            color: #ecf0f1;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }}
+        .buy-button {{
+            background: linear-gradient(45deg, {palette['primary']}, {palette['secondary']});
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }}
+        .features h2 {{
+            color: #ecf0f1;
+            border-bottom: 2px solid {palette['primary']};
+            padding-bottom: 10px;
+        }}
+        """
+    elif template == "minimal":
+        return f"""
+        body {{
+            background: #f8f9fa;
+            color: #212529;
+        }}
+        .container {{
+            background: white;
+            border: none;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            border-radius: 0;
+        }}
+        .header {{
+            border-bottom: 1px solid #dee2e6;
+        }}
+        .header h1 {{
+            color: #212529;
+            font-weight: 300;
+            font-size: 2.2rem;
+        }}
+        .buy-button {{
+            background: {palette['primary']};
+            border-radius: 4px;
+            font-weight: 400;
+        }}
+        .features li:before {{
+            content: "→";
+            color: {palette['primary']};
+        }}
+        """
+    elif template == "bold":
+        return f"""
+        body {{
+            background: {palette['gradient']};
+        }}
+        .container {{
+            background: white;
+            border: 5px solid {palette['primary']};
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }}
+        .header h1 {{
+            color: {palette['primary']};
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }}
+        .price {{
+            font-size: 4rem;
+            color: {palette['accent']};
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }}
+        .buy-button {{
+            background: linear-gradient(45deg, {palette['accent']}, {palette['primary']});
+            text-transform: uppercase;
+            font-weight: 900;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }}
+        """
+    elif template == "elegant":
+        return f"""
+        body {{
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }}
+        .container {{
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }}
+        .header h1 {{
+            color: {palette['text']};
+            font-weight: 200;
+            font-family: 'Georgia', serif;
+            font-size: 2.8rem;
+            line-height: 1.2;
+        }}
+        .header .subtitle {{
+            font-style: italic;
+            font-size: 1.1rem;
+        }}
+        .buy-button {{
+            background: linear-gradient(45deg, {palette['primary']}, {palette['secondary']});
+            border-radius: 30px;
+            font-weight: 300;
+            padding: 25px 50px;
+        }}
+        .features li {{
+            border-bottom: 1px solid #f8f9fa;
+            font-size: 1.1rem;
+        }}
+        """
+    else:  # modern (default)
+        return f"""
+        body {{
+            background: {palette['gradient']};
+        }}
+        .container {{
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }}
+        .buy-button {{
+            background: linear-gradient(45deg, {palette['primary']}, {palette['secondary']});
+        }}
+        .features h2 {{
+            color: {palette['text']};
+        }}
+        """
 
 def generate_sales_page_html(product_data, product_content):
     """Generate a professional sales page HTML from product data"""
@@ -116,6 +317,9 @@ def generate_sales_page_html(product_data, product_content):
     content_length = len(product_content)
     base_price = min(97, max(27, (content_length // 100) + len(keywords) * 3))
     
+    # Get template styles
+    template_styles = get_template_styles(sales_copy['template'], sales_copy['color_scheme'])
+    
     # Create the HTML template with AI-generated sales copy
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -132,7 +336,6 @@ def generate_sales_page_html(product_data, product_content):
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }}
         
@@ -140,11 +343,8 @@ def generate_sales_page_html(product_data, product_content):
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background: white;
             margin-top: 20px;
             margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }}
         
         .header {{
@@ -156,7 +356,6 @@ def generate_sales_page_html(product_data, product_content):
         
         .header h1 {{
             font-size: 2.5rem;
-            color: #2c3e50;
             margin-bottom: 10px;
             font-weight: 700;
         }}
@@ -169,14 +368,12 @@ def generate_sales_page_html(product_data, product_content):
         
         .price {{
             font-size: 3rem;
-            color: #e74c3c;
             font-weight: bold;
             margin: 20px 0;
         }}
         
         .buy-button {{
             display: inline-block;
-            background: linear-gradient(45deg, #3498db, #2980b9);
             color: white;
             padding: 20px 40px;
             text-decoration: none;
@@ -185,12 +382,10 @@ def generate_sales_page_html(product_data, product_content):
             font-weight: bold;
             margin: 20px 0;
             transition: transform 0.3s ease;
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
         }}
         
         .buy-button:hover {{
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(52, 152, 219, 0.4);
         }}
         
         .features {{
@@ -198,7 +393,6 @@ def generate_sales_page_html(product_data, product_content):
         }}
         
         .features h2 {{
-            color: #2c3e50;
             margin-bottom: 20px;
             font-size: 1.8rem;
         }}
@@ -242,7 +436,6 @@ def generate_sales_page_html(product_data, product_content):
         }}
         
         .preview h3 {{
-            color: #2c3e50;
             margin-bottom: 15px;
         }}
         
@@ -267,12 +460,43 @@ def generate_sales_page_html(product_data, product_content):
             color: #856404;
         }}
         
+        .testimonial {{
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-style: italic;
+            border-left: 5px solid #17a2b8;
+        }}
+        
+        .stats {{
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            text-align: center;
+        }}
+        
+        .stat {{
+            flex: 1;
+            padding: 20px;
+        }}
+        
+        .stat-number {{
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }}
+        
         @media (max-width: 768px) {{
             .container {{ margin: 10px; padding: 15px; }}
             .header h1 {{ font-size: 2rem; }}
             .price {{ font-size: 2.5rem; }}
             .buy-button {{ padding: 15px 30px; font-size: 1.1rem; }}
+            .stats {{ flex-direction: column; }}
         }}
+        
+        /* Apply template-specific styles */
+        {template_styles}
     </style>
 </head>
 <body>
@@ -283,6 +507,21 @@ def generate_sales_page_html(product_data, product_content):
             <p class="subtitle">{sales_copy['subheadline']}</p>
             <div class="price">${base_price}</div>
             <a href="#buy-now" class="buy-button" id="buyButton">📈 Get Instant Access Now</a>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">{len(product_content.split())}</div>
+                <div>Words of Content</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">{len(sales_copy['benefits'])}</div>
+                <div>Key Benefits</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">24/7</div>
+                <div>Instant Access</div>
+            </div>
         </div>
         
         <div class="features">
@@ -301,6 +540,10 @@ def generate_sales_page_html(product_data, product_content):
             <p><strong>Generated:</strong> {datetime.now().strftime('%B %Y')}</p>
         </div>
         
+        <div class="testimonial">
+            <p>"This type of AI-generated market intelligence would typically cost thousands from consulting firms. The insights are incredibly detailed and actionable." - Industry Expert</p>
+        </div>
+        
         <div class="urgency">
             ⚡ {sales_copy['urgency']}
         </div>
@@ -317,6 +560,7 @@ def generate_sales_page_html(product_data, product_content):
         <div style="text-align: center; padding: 20px; color: #7f8c8d; font-size: 0.9rem;">
             <p>Generated by ANIPE - Autonomous Niche Intelligence & Product Engine</p>
             <p>© {datetime.now().year} AI Business Intelligence. All rights reserved.</p>
+            <p>Template: {sales_copy['template'].title()} | Colors: {sales_copy['color_scheme'].title()}</p>
         </div>
     </div>
     
