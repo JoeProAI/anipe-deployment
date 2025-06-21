@@ -14,8 +14,93 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
+def generate_ai_sales_copy(product_data, product_content):
+    """Generate AI-powered sales copy based on the product content"""
+    
+    # Default sales copy in case AI fails
+    default_copy = {
+        "headline": f"Revolutionary {product_data.get('niche_topic', 'Digital Product')} Guide",
+        "subheadline": "Transform your approach with AI-generated insights",
+        "benefits": [
+            "Comprehensive analysis and recommendations",
+            "Data-driven insights you can't find elsewhere", 
+            "Actionable strategies for immediate implementation",
+            "Expert-level knowledge distilled into practical steps"
+        ],
+        "description": "This comprehensive guide provides cutting-edge insights that would cost thousands from consulting firms.",
+        "urgency": "Limited time offer - Get instant access today!"
+    }
+    
+    try:
+        # Get API key and check if available
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            print("No GEMINI_API_KEY found, using default sales copy")
+            return default_copy
+            
+        # Configure Gemini
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Create prompt for sales copy generation
+        prompt = f"""
+Generate compelling sales copy for a digital product based on this content:
+
+PRODUCT TOPIC: {product_data.get('niche_topic', 'Digital Product')}
+TARGET AUDIENCE: {product_data.get('target_audience', 'Professionals')}
+PROBLEM STATEMENT: {product_data.get('problem_statement', 'Industry challenges')}
+KEYWORDS: {', '.join(product_data.get('keywords', []))}
+
+PRODUCT CONTENT PREVIEW:
+{product_content[:1000]}...
+
+Generate sales copy in this JSON format:
+{{
+    "headline": "Compelling headline that grabs attention (max 60 chars)",
+    "subheadline": "Supporting subheadline that explains the value (max 120 chars)",
+    "benefits": [
+        "Specific benefit 1 based on actual content",
+        "Specific benefit 2 based on actual content", 
+        "Specific benefit 3 based on actual content",
+        "Specific benefit 4 based on actual content"
+    ],
+    "description": "2-3 sentence description of what they'll get and why it's valuable",
+    "urgency": "Urgency statement to encourage immediate action"
+}}
+
+Make it sound professional but exciting. Focus on the specific value this content provides.
+"""
+        
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
+        
+        # Clean up response if needed
+        if response_text.startswith("```json"):
+            response_text = response_text[7:]
+        if response_text.endswith("```"):
+            response_text = response_text[:-3]
+            
+        # Parse AI response
+        ai_copy = json.loads(response_text)
+        
+        # Validate required fields exist
+        required_fields = ['headline', 'subheadline', 'benefits', 'description', 'urgency']
+        for field in required_fields:
+            if field not in ai_copy:
+                raise ValueError(f"Missing required field: {field}")
+                
+        print(f"AI sales copy generated successfully for: {ai_copy['headline']}")
+        return ai_copy
+        
+    except Exception as e:
+        print(f"AI sales copy generation failed: {e}, using default copy")
+        return default_copy
+
 def generate_sales_page_html(product_data, product_content):
     """Generate a professional sales page HTML from product data"""
+    
+    # Generate AI-powered sales copy based on the product content
+    sales_copy = generate_ai_sales_copy(product_data, product_content)
     
     # Extract key information
     niche_topic = product_data.get('niche_topic', 'Digital Product')
@@ -31,14 +116,14 @@ def generate_sales_page_html(product_data, product_content):
     content_length = len(product_content)
     base_price = min(97, max(27, (content_length // 100) + len(keywords) * 3))
     
-    # Create the HTML template
+    # Create the HTML template with AI-generated sales copy
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{niche_topic} - AI-Generated Business Intelligence Report</title>
-    <meta name="description" content="{problem_statement[:160]}">
+    <title>{sales_copy['headline']} - AI-Generated Business Intelligence Report</title>
+    <meta name="description" content="{sales_copy['description'][:160]}">
     <meta name="keywords" content="{', '.join(keywords)}">
     
     <style>
@@ -171,6 +256,17 @@ def generate_sales_page_html(product_data, product_content):
             margin: 10px 0;
         }}
         
+        .urgency {{
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+            font-weight: bold;
+            color: #856404;
+        }}
+        
         @media (max-width: 768px) {{
             .container {{ margin: 10px; padding: 15px; }}
             .header h1 {{ font-size: 2rem; }}
@@ -183,8 +279,8 @@ def generate_sales_page_html(product_data, product_content):
     <div class="container">
         <div class="header">
             <div class="ai-badge">🤖 AI-Generated Business Intelligence</div>
-            <h1>{niche_topic}</h1>
-            <p class="subtitle">{problem_statement}</p>
+            <h1>{sales_copy['headline']}</h1>
+            <p class="subtitle">{sales_copy['subheadline']}</p>
             <div class="price">${base_price}</div>
             <a href="#buy-now" class="buy-button" id="buyButton">📈 Get Instant Access Now</a>
         </div>
@@ -192,22 +288,21 @@ def generate_sales_page_html(product_data, product_content):
         <div class="features">
             <h2>🎯 What You'll Get:</h2>
             <ul>
-                <li>Comprehensive market analysis for {target_audience.lower()}</li>
-                <li>AI-powered opportunity identification and validation</li>
-                <li>Actionable business recommendations and next steps</li>
-                <li>Professional report format ready for implementation</li>
-                <li>Data-driven insights from advanced AI analysis</li>
-                <li>Instant download - get started immediately</li>
-                <li>Commercial usage rights included</li>
+                {''.join([f'<li>{benefit}</li>' for benefit in sales_copy['benefits']])}
             </ul>
         </div>
         
         <div class="preview">
-            <h3>📋 Report Preview:</h3>
+            <h3>📋 About This Report:</h3>
+            <p>{sales_copy['description']}</p>
             <p><strong>Target Market:</strong> {target_audience}</p>
             <p><strong>Key Focus Areas:</strong> {', '.join(keywords[:5])}</p>
             <p><strong>Report Length:</strong> {len(product_content.split())} words of actionable content</p>
             <p><strong>Generated:</strong> {datetime.now().strftime('%B %Y')}</p>
+        </div>
+        
+        <div class="urgency">
+            ⚡ {sales_copy['urgency']}
         </div>
         
         <div class="guarantee">
