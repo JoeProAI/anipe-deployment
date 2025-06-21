@@ -67,6 +67,8 @@ main:
         call: http.post
         args:
           url: https://storage.googleapis.com/upload/storage/v1/b/windsurf-anipe-data/o
+          auth:
+            type: OIDC
           query:
             uploadType: media
             name: ${"results/anipe_complete_" + string(sys.now()) + ".json"}
