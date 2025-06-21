@@ -22,7 +22,7 @@ main:
     - logOpportunity:
         call: sys.log
         args:
-          text: '${"Identified opportunity: " + string(opportunityResult.body.opportunity.niche_topic)}'
+          text: '${"Identified opportunity: " + string(opportunityResult.body.niche_topic)}'
           severity: INFO
           
     # Step 2: Check if opportunity was successfully identified
@@ -39,10 +39,10 @@ main:
         args:
           url: PRODUCT_GENERATOR_URL/generate
           body:
-            niche_topic: ${opportunityResult.body.opportunity.niche_topic}
-            problem_statement: ${opportunityResult.body.opportunity.problem_statement}
-            target_audience: ${opportunityResult.body.opportunity.target_audience}
-            product_idea: ${opportunityResult.body.opportunity.product_idea}
+            niche_topic: ${opportunityResult.body.niche_topic}
+            problem_statement: ${opportunityResult.body.problem_statement}
+            target_audience: ${opportunityResult.body.target_audience}
+            product_idea: ${opportunityResult.body.product_idea}
           timeout: 300
         result: productResult
 
@@ -52,7 +52,7 @@ main:
         args:
           url: SALES_PAGE_GENERATOR_URL/generate
           body:
-            opportunity: ${opportunityResult.body.opportunity}
+            opportunity: ${opportunityResult.body}
             product_content: ${productResult.body.content}
           timeout: 300
         result: salesPageResult
@@ -70,7 +70,7 @@ main:
             Content-Type: application/json
           body:
             timestamp: ${string(sys.now())}
-            opportunity: ${opportunityResult.body.opportunity}
+            opportunity: ${opportunityResult.body}
             product_path: ${productResult.body.gcs_path}
             sales_page_url: ${salesPageResult.body.gcs_url}
             status: "success"
@@ -80,7 +80,7 @@ main:
     # Return the final result
     - returnResult:
         return:
-          opportunity: ${opportunityResult.body.opportunity}
+          opportunity: ${opportunityResult.body}
           product_path: ${productResult.body.gcs_path}
           sales_page_url: ${salesPageResult.body.gcs_url}
           status: "success"
