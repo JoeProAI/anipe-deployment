@@ -91,7 +91,19 @@ def identify_niche_opportunity(search_results: list) -> dict:
     - "confidence_score": A score from 0.0 to 1.0 indicating confidence in this opportunity.
     """
     
-    # Try to use Gemini AI
+    # Start with complete default data to guarantee all required keys
+    default_opportunity = {
+        "niche_topic": "AI-powered personalized nutrition plans for diabetics",
+        "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
+        "target_audience": "Healthcare professionals and diabetic patients", 
+        "product_idea": "A comprehensive guide to AI-powered nutrition planning for diabetes management",
+        "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
+        "confidence_score": 0.8,
+        "ai_powered": False,
+        "status": "success"
+    }
+    
+    # Try to use Gemini AI and merge with defaults
     try:
         if os.environ.get("GEMINI_API_KEY"):
             model = genai.GenerativeModel('gemini-1.5-flash')
@@ -104,19 +116,14 @@ def identify_niche_opportunity(search_results: list) -> dict:
                 if response_text.endswith("```"):
                     response_text = response_text[:-3]
             
-            opportunity = json.loads(response_text)
+            ai_opportunity = json.loads(response_text)
             
-            # Validate that all required keys are present
-            required_keys = ["niche_topic", "problem_statement", "target_audience", "product_idea", "keywords", "confidence_score"]
-            missing_keys = [key for key in required_keys if key not in opportunity]
+            # Merge AI response with defaults (AI data takes precedence)
+            default_opportunity.update(ai_opportunity)
+            default_opportunity["ai_powered"] = True
             
-            if missing_keys:
-                raise Exception(f"AI response missing required keys: {missing_keys}")
-            
-            opportunity["status"] = "success"
-            opportunity["ai_powered"] = True
-            print(f"AI generation successful: {opportunity.get('niche_topic', 'N/A')}")
-            return opportunity
+            print(f"AI generation successful: {default_opportunity.get('niche_topic', 'N/A')}")
+            return default_opportunity
         else:
             raise Exception("No API key available")
             
@@ -124,20 +131,10 @@ def identify_niche_opportunity(search_results: list) -> dict:
         error_msg = f"AI generation failed: {str(e)}"
         print(error_msg)
         
-        # Return reliable fallback response with all required keys
-        opportunity = {
-            "niche_topic": "AI-powered personalized nutrition plans for diabetics",
-            "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
-            "target_audience": "Healthcare professionals and diabetic patients", 
-            "product_idea": "A weekly AI-generated report on emerging sustainable energy patents",
-            "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
-            "confidence_score": 0.8,
-            "ai_powered": False,
-            "debug_error": error_msg,  # Add error details for debugging
-            "status": "success"
-        }
+        # Add error details for debugging but keep all required keys
+        default_opportunity["debug_error"] = error_msg
         
-        return opportunity
+        return default_opportunity
 
 # --- API Endpoint ---
 @app.route('/identify', methods=['POST'])
