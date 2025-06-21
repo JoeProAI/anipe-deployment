@@ -71,13 +71,12 @@ main:
             uploadType: media
             name: ${"results/anipe_complete_" + string(sys.now()) + ".json"}
           headers:
-            Authorization: ${"Bearer " + sys.get_env("GOOGLE_CLOUD_TOKEN")}
             Content-Type: application/json
           body:
             timestamp: ${string(sys.now())}
             opportunity: ${opportunityResult.body}
             product_path: ${productResult.body.gcs_path}
-            sales_page_url: ${salesPageResult.body.gcs_url}
+            sales_page_url: ${default(salesPageResult.body.gcs_url, "not_generated")}
             status: "success"
           timeout: 60
         result: storeResult
@@ -87,7 +86,7 @@ main:
         return:
           opportunity: ${opportunityResult.body}
           product_path: ${productResult.body.gcs_path}
-          sales_page_url: ${salesPageResult.body.gcs_url}
+          sales_page_url: ${default(salesPageResult.body.gcs_url, "not_generated")}
           status: "success"
           message: "ANIPE workflow completed successfully"
           
