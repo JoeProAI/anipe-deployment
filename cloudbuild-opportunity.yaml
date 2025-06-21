@@ -6,20 +6,6 @@ steps:
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest']
-  
-  # Deploy container image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-    - 'run'
-    - 'deploy'
-    - 'anip-opportunity-identifier'
-    - '--image=us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-opportunity-identifier:latest'
-    - '--platform=managed'
-    - '--region=${_REGION}'
-    - '--allow-unauthenticated'
-    - '--memory=1Gi'
-    - '--set-env-vars=GCS_BUCKET_NAME=${_GCS_BUCKET_NAME},GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${_REGION}'
 
 # Store images in Artifact Registry
 images:
