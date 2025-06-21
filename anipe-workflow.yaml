@@ -75,7 +75,7 @@ main:
           body:
             timestamp: ${string(sys.now())}
             opportunity: ${opportunityResult.body}
-            product_path: ${productResult.body.gcs_path}
+            product_path: ${productResult.body.product_gcs_path}
             sales_page_url: ${default(salesPageResult.body.gcs_url, "not_generated")}
             status: "success"
           timeout: 60
@@ -85,7 +85,7 @@ main:
     - returnResult:
         return:
           opportunity: ${opportunityResult.body}
-          product_path: ${productResult.body.gcs_path}
+          product_path: ${productResult.body.product_gcs_path}
           sales_page_url: ${default(salesPageResult.body.gcs_url, "not_generated")}
           status: "success"
           message: "ANIPE workflow completed successfully"
