@@ -145,6 +145,7 @@ def generate_product():
         response = {
             "status": "success", 
             "message": "Product generated and saved.", 
+            "content": product_content,  # Add the actual content for the workflow
             "product_gcs_path": f"gs://{GCS_BUCKET_NAME}/{product_blob_name}", 
             "opportunity": opportunity
         }
