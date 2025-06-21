@@ -7,7 +7,7 @@ This file should NOT be committed to Git (contains sensitive data).
 import google.generativeai as genai
 
 # Test the API key format
-api_key = "AIzaSyAUZgIT2o1RsY4cQLFTtC6om-B-6ESzsbQ"
+api_key = "GEMINI_API_KEY"
 print(f"API Key format check: {'✅ Valid format' if api_key.startswith('AIzaSy') else '❌ Invalid format'}")
 
 try:
