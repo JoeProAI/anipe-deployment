@@ -25,10 +25,5 @@ steps:
 images:
   - 'us-central1-docker.pkg.dev/${PROJECT_ID}/anipe-repo/anip-product-generator:latest'
 
-substitutions:
-  _VERSION: v1.0
-  _REGION: us-central1
-  _GCS_BUCKET_NAME: windsurf-anipe-data  # Replace with your actual bucket name
-
 options:
   logging: CLOUD_LOGGING_ONLY
