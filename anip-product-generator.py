@@ -134,8 +134,9 @@ def generate_product():
         product_content = generate_product_content(opportunity)
         
         # Save the generated product content to GCS
-        # Sanitize niche_topic for filename
-        safe_niche_topic = opportunity['niche_topic'].replace(' ', '_').replace('/', '-').replace(':', '').replace(',', '')
+        # Sanitize niche_topic for filename (use fallback if missing)
+        niche_topic = opportunity.get('niche_topic', 'unknown_niche')
+        safe_niche_topic = niche_topic.replace(' ', '_').replace('/', '-').replace(':', '').replace(',', '')
         product_blob_name = f"products/{safe_niche_topic}_{datetime.now().strftime('%Y%m%d%H%M%S')}.md"
         product_blob = storage_client.bucket(GCS_BUCKET_NAME).blob(product_blob_name)
         product_blob.upload_from_string(product_content, content_type="text/markdown")
