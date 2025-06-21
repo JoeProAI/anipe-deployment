@@ -66,12 +66,9 @@ main:
     - storeResults:
         call: http.post
         args:
-          url: https://storage.googleapis.com/upload/storage/v1/b/windsurf-anipe-data/o
+          url: https://anip-opportunity-identifier-xyuwznxqiq-uc.a.run.app/store
           auth:
             type: OIDC
-          query:
-            uploadType: media
-            name: ${"results/anipe_complete_" + string(sys.now()) + ".json"}
           headers:
             Content-Type: application/json
           body:

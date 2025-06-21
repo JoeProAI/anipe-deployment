@@ -193,6 +193,38 @@ def health_check():
     """Health check endpoint for Cloud Run."""
     return jsonify({"status": "healthy", "service": "anip-opportunity-identifier"}), 200
 
+# Store results endpoint - accepts final workflow results and stores in GCS
+@app.route('/store', methods=['POST'])
+def store_results():
+    """API endpoint to store final ANIPE workflow results in GCS."""
+    try:
+        # Get request data
+        data = request.get_json()
+        if not data:
+            return jsonify({"status": "error", "message": "No data provided"}), 400
+        
+        # Store the complete results in GCS
+        bucket = storage_client.bucket(GCS_BUCKET_NAME)
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        blob_name = f"results/anipe_complete_{timestamp}.json"
+        blob = bucket.blob(blob_name)
+        blob.upload_from_string(json.dumps(data, indent=2), content_type="application/json")
+        
+        print(f"Successfully stored results in GCS: {blob_name}")
+        
+        # Return success response
+        response = {
+            "status": "success", 
+            "message": "Results stored successfully.", 
+            "gcs_path": f"gs://{GCS_BUCKET_NAME}/{blob_name}",
+            "timestamp": timestamp
+        }
+        return jsonify(response), 200
+        
+    except Exception as e:
+        print(f"Error in store_results: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 # Main entry point
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
