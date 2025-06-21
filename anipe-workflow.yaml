@@ -39,10 +39,7 @@ main:
         args:
           url: PRODUCT_GENERATOR_URL/generate
           body:
-            niche_topic: ${opportunityResult.body.niche_topic}
-            problem_statement: ${opportunityResult.body.problem_statement}
-            target_audience: ${opportunityResult.body.target_audience}
-            product_idea: ${opportunityResult.body.product_idea}
+            opportunity: ${opportunityResult.body}
           timeout: 300
         result: productResult
 
