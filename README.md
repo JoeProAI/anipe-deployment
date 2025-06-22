@@ -220,3 +220,5 @@ For issues or questions:
 3. **Results**: Check your GCS bucket for generated opportunities and products
 
 The system is designed to run autonomously and generate income-producing digital products without manual intervention.
+
+<!-- Deployment trigger: Secret Manager permissions fixed - ready for payment system test -->
