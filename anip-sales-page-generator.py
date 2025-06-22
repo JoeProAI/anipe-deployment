@@ -17,10 +17,8 @@ app = Flask(__name__)
 
 @app.route('/favicon.ico')
 def favicon():
-    # Return a simple 1x1 transparent PNG as binary data
-    # This is a 1x1 transparent PNG encoded as base64
-    png_data = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
-    return png_data, 200, {'Content-Type': 'image/png'}
+    # Return 204 No Content - standard way to handle missing favicons
+    return '', 204
 
 # Initialize Stripe
 stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")

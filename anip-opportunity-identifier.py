@@ -13,9 +13,8 @@ app = Flask(__name__)
 # Add favicon route to prevent 404 errors
 @app.route('/favicon.ico')
 def favicon():
-    # Return a simple 1x1 transparent PNG as binary data
-    png_data = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
-    return png_data, 200, {'Content-Type': 'image/png'}
+    # Return 204 No Content - standard way to handle missing favicons
+    return '', 204
 
 # Initialize GCP clients
 try:
