@@ -62,7 +62,20 @@ main:
           timeout: 300
         result: salesPageResult
 
-    # Step 5: Store the results
+    # Step 5: Promote on Social Media
+    - promoteSocialMedia:
+        call: http.post
+        args:
+          url: SOCIAL_MEDIA_POSTER_URL/promote
+          headers:
+            Content-Type: application/json
+          body:
+            product_data: ${opportunityResult.body}
+            sales_page_url: ${default(salesPageResult.body.gcs_url, "https://placeholder-sales-page.com")}
+          timeout: 120
+        result: socialMediaResult
+
+    # Step 6: Store the results
     - storeResults:
         call: http.post
         args:
