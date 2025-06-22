@@ -6,6 +6,7 @@ Converts opportunities into professional digital products with PDF output
 
 import os
 import json
+import base64
 from datetime import datetime
 from flask import Flask, request, jsonify
 from google.cloud import storage
@@ -17,7 +18,6 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from io import BytesIO
-import base64
 
 # Initialize Flask app
 app = Flask(__name__)

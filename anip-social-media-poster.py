@@ -6,6 +6,7 @@ Automatically creates and posts promotional content for new products
 
 import os
 import json
+import base64
 import requests
 from datetime import datetime
 from flask import Flask, request, jsonify
@@ -17,7 +18,6 @@ app = Flask(__name__)
 @app.route('/favicon.ico')
 def favicon():
     # Return a simple 1x1 transparent PNG as binary data
-    import base64
     png_data = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
     return png_data, 200, {'Content-Type': 'image/png'}
 
