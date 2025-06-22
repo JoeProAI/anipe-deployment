@@ -14,6 +14,11 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
+@app.route('/favicon.ico')
+def favicon():
+    # Return a simple 1x1 transparent PNG as base64 to avoid 404s
+    return '''data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==''', 200, {'Content-Type': 'image/png'}
+
 # Initialize GCP clients
 try:
     storage_client = storage.Client()
