@@ -17,6 +17,7 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from io import BytesIO
+import base64
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -24,8 +25,9 @@ app = Flask(__name__)
 # Favicon route to prevent 404 errors
 @app.route('/favicon.ico')
 def favicon():
-    # Return a simple 1x1 transparent PNG as base64 to avoid 404s
-    return '''data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==''', 200, {'Content-Type': 'image/png'}
+    # Return a simple 1x1 transparent PNG as binary data
+    png_data = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+    return png_data, 200, {'Content-Type': 'image/png'}
 
 # Initialize GCP clients
 try:
