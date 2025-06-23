@@ -83,29 +83,64 @@ def identify_niche_opportunity(search_results: list) -> dict:
         return {"status": "no_opportunity", "message": "No relevant search results found."}
 
     prompt = f"""
-    Analyze the following web search results and identify a highly specific, commercially viable micro-niche opportunity.
-    Focus on a problem or question that AI could help solve or provide unique insights for.
-    
-    Search Results:
+    CRITICAL INSTRUCTIONS: You are an expert niche market researcher tasked with finding HIGHLY SPECIFIC, UNIQUE micro-opportunities that are NOT obvious or generic.
+
+    FORBIDDEN TOPICS (DO NOT suggest anything related to):
+    - Generic "communication" or "productivity"
+    - Basic "time management" or "organization"  
+    - Broad "marketing" or "social media"
+    - Generic "wellness" or "fitness"
+    - Common "leadership" or "team building"
+    - Overused "AI tools" or "automation"
+
+    REQUIREMENTS FOR A VALID OPPORTUNITY:
+    1. Must be HYPER-SPECIFIC (not broad categories)
+    2. Must target a clear, defined audience with money to spend
+    3. Must solve a real, painful problem people pay to fix
+    4. Must be something that can generate $5K+ monthly revenue
+    5. Must be based on emerging trends or underserved segments
+    6. Must be actionable and not theoretical
+
+    Search Results to Analyze:
     {json.dumps(search_results, indent=2)}
+
+    EXAMPLES of the specificity level required:
+    GOOD: "AI-powered inventory optimization for artisanal food producers selling at farmers markets"
+    GOOD: "Automated compliance reporting system for cryptocurrency tax accountants"
+    GOOD: "Voice-to-text transcription service specialized for medical professionals treating ADHD patients"
     
-    Provide your analysis in JSON format with the following keys:
-    - "niche_topic": A very specific, actionable topic (e.g., "AI-powered personalized nutrition plans for diabetics").
-    - "problem_statement": The core problem this niche addresses.
-    - "target_audience": Who would pay for a solution/product in this niche.
-    - "product_idea": A concrete digital product idea (e.g., "A weekly AI-generated report on emerging sustainable energy patents").
-    - "keywords": 3-5 relevant keywords for this niche.
-    - "confidence_score": A score from 0.0 to 1.0 indicating confidence in this opportunity.
+    BAD: "Communication tools"
+    BAD: "Productivity software"
+    BAD: "AI-powered insights"
+
+    Based on the search results, identify ONE unique micro-niche that meets ALL requirements above.
+
+    Respond ONLY in valid JSON format:
+    {{
+        "niche_topic": "Ultra-specific 8-12 word description targeting exact audience and use case",
+        "problem_statement": "Specific pain point that costs this audience time/money/stress",
+        "target_audience": "Precise demographic with purchasing power (job title, industry, situation)",
+        "product_idea": "Concrete digital solution (report, tool, course, template) they'd pay $50-500 for",
+        "keywords": ["specific", "niche", "terms", "not", "generic"],
+        "revenue_potential": "Realistic monthly revenue estimate with reasoning",
+        "market_validation": "Why this audience would actually pay for this solution",
+        "confidence_score": 0.85
+    }}
     """
     
     # Start with complete default data to guarantee all required keys
+    # Use timestamp to ensure uniqueness even in fallback mode
+    timestamp_suffix = datetime.now().strftime("%H%M")
+    
     default_opportunity = {
-        "niche_topic": "AI-powered personalized nutrition plans for diabetics",
-        "problem_statement": "Creating personalized nutrition plans for diabetics using AI",
-        "target_audience": "Healthcare professionals and diabetic patients", 
-        "product_idea": "A comprehensive guide to AI-powered nutrition planning for diabetes management",
-        "keywords": ["AI", "nutrition", "diabetes", "personalized medicine"],
-        "confidence_score": 0.8,
+        "niche_topic": f"AI-powered patent analysis for renewable energy startups targeting Series A funding ({timestamp_suffix})",
+        "problem_statement": "Renewable energy startups spend 40+ hours manually analyzing patent landscapes before investor meetings, often missing critical IP conflicts", 
+        "target_audience": "Renewable energy startup founders preparing for Series A funding rounds ($2M+ raises)", 
+        "product_idea": "Weekly AI-generated patent landscape reports with competitive analysis and IP risk assessment for specific renewable energy sectors",
+        "keywords": ["patent analysis", "renewable energy", "IP due diligence", "startup funding", "Series A"],
+        "revenue_potential": "$15,000/month from 30 startups paying $500/month for weekly reports",
+        "market_validation": "Series A startups have budget for IP due diligence and investors require thorough patent analysis before funding decisions",
+        "confidence_score": 0.85,
         "ai_powered": False,
         "status": "success"
     }

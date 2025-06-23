@@ -153,26 +153,72 @@ def generate_product_content(opportunity: dict) -> str:
     target_audience = opportunity.get("target_audience", "general audience")
     
     prompt = f"""
-    Generate a comprehensive, high-quality digital product for the following opportunity:
+    You are a senior industry consultant creating a premium digital product for paying customers.
     
+    CRITICAL REQUIREMENTS:
+    - This product will be SOLD for $50-500, so it must be GENUINELY VALUABLE
+    - Must be highly specific to the niche (not generic advice)
+    - Must include ACTIONABLE insights, not theoretical concepts
+    - Must demonstrate deep industry knowledge and expertise
+    - Must provide specific data, examples, and case studies where possible
+    - Must be professional-grade content that justifies the price point
+    
+    PRODUCT BRIEF:
     Product Idea: {product_idea}
     Niche Topic: {niche_topic}
     Problem Addressed: {problem_statement}
     Target Audience: {target_audience}
     
-    Create a professional report or guide with the following structure:
-    1. Executive Summary (2-3 paragraphs)
-    2. Introduction to the Problem (detailed explanation)
-    3. Market Analysis (current trends, opportunities)
-    4. Detailed Solution/Strategy (at least 3 main sections with actionable insights)
-    5. Implementation Guidelines (step-by-step recommendations)
-    6. Tools and Resources (specific recommendations)
-    7. Future Outlook and Trends
-    8. Conclusion with Key Takeaways
+    Create a comprehensive, premium-quality report with these sections:
     
-    Make it authoritative, valuable, and actionable for the target audience.
-    The content should be comprehensive (aim for 2000+ words) and provide genuine value.
-    Use professional formatting with clear headings and bullet points where appropriate.
+    1. EXECUTIVE SUMMARY (3-4 paragraphs)
+       - Quantify the problem (costs, time, risks)
+       - Present key findings and recommendations
+       - Include specific ROI or value metrics
+    
+    2. MARKET LANDSCAPE ANALYSIS
+       - Current market size and trends (include specific numbers where possible)
+       - Key players and competitive dynamics
+       - Regulatory/technology factors affecting the space
+       - Identified gaps and opportunities
+    
+    3. DEEP-DIVE PROBLEM ANALYSIS
+       - Root causes of the problem
+       - Current typical solutions and their limitations
+       - Cost analysis of status quo vs. proposed solution
+       - Real-world examples and case studies
+    
+    4. STRATEGIC SOLUTION FRAMEWORK
+       - Detailed methodology/approach (step-by-step)
+       - Specific tools, technologies, and resources required
+       - Implementation timeline and milestones
+       - Risk mitigation strategies
+    
+    5. ACTIONABLE IMPLEMENTATION GUIDE
+       - Detailed action items with priorities
+       - Templates, checklists, or frameworks
+       - Vendor recommendations and evaluation criteria
+       - Budget considerations and ROI calculations
+    
+    6. INDUSTRY-SPECIFIC INSIGHTS
+       - Expert predictions for the next 12-24 months
+       - Emerging technologies or trends to watch
+       - Potential disruptions or opportunities
+       - Strategic recommendations for staying ahead
+    
+    7. CONCLUSION & NEXT STEPS
+       - Key takeaways and action priorities
+       - Success metrics and KPIs to track
+       - Resources for continued learning
+    
+    QUALITY STANDARDS:
+    - Minimum 3000 words of substantive content
+    - Include specific examples, case studies, or data points
+    - Use professional business language
+    - Provide frameworks, not just theories
+    - Make it worth the asking price
+    
+    Write as an authoritative industry expert with deep domain knowledge.
     """
     
     # Try to use Gemini AI
